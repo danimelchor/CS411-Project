@@ -78,4 +78,8 @@ public class Restaurant {
   public void deleteItem(int itemIdx) {
     menu.remove(itemIdx);
   }
+
+  public int getMenuLength(){
+    return menu.size();
+  }
 }

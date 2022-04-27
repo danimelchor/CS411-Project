@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import Database.Database;
@@ -299,9 +300,11 @@ public class CLI {
         /* Add item to menu */
         System.out.println("Name of item to add: ");
         String itemName = scanner.next();
+        double itemPrice;
+        
         System.out.println("Price of item: ");
-        double itemPrice = scanner.nextDouble();
-
+        itemPrice = scanner.nextDouble();
+         
         Item i = new Item(itemName, itemPrice);
         r.addNewItem(i);
 
@@ -313,6 +316,11 @@ public class CLI {
         r.displayMenu();
         System.out.println("\nID of menu item to edit: ");
         int id = scanner.nextInt();
+
+        while(id > r.getMenuLength() -1 || id < 0){
+          System.out.println("Not a valid item ID, try again");
+          id = scanner.nextInt();
+        }
 
         System.out.println("New name: ");
         itemName = scanner.next();
@@ -331,6 +339,10 @@ public class CLI {
         System.out.println("\nID of menu item to delete: ");
         id = scanner.nextInt();
 
+        while(id > r.getMenuLength() -1 || id < 0){
+            System.out.println("Not a valid item ID, try again");
+            id = scanner.nextInt();
+        }
         r.deleteItem(id);
 
         r.displayMenu();
