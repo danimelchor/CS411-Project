@@ -55,7 +55,7 @@ public class CLI {
     order = null;
   }
 
-  public boolean mainCmds(int cmd, Scanner scanner) {
+  public boolean mainCommands(int cmd, Scanner scanner) {
     boolean shouldExit = false;
 
     switch (cmd) {
@@ -252,7 +252,6 @@ public class CLI {
           Restaurant placeOrderRestaurant = cart.getRestaurant();
           placeOrderRestaurant.addNewOrder(order);
           printSuccess("Successfully placed your order in position #" + placeOrderRestaurant.getNumOfOrders());
-          order = null;
           cart = null;
         }
         break;
@@ -411,34 +410,30 @@ public class CLI {
     };
 
     for (int i = 0; i < restaurantOwners.length; i++) {
+      // For every restaurant owner
       String[] u = restaurantOwners[i];
 
+      // Create the restaurant and store in DB
       Restaurant restaurant = new Restaurant(u[2]);
       RestaurantOwner newRestaurantOwner = new RestaurantOwner(u[0], u[1], restaurant);
       db.addOwner(u[0], newRestaurantOwner);
       db.addRestaurant(u[2], restaurant);
 
+      // Just to have a closed restaurant
       if (i == 2)
         restaurant.closeRestaurant();
 
+      // Add items to restaurant
       String[] itemNames = menuItems[i];
       double[] itemPrices = menuPrices[i];
       for (int j = 0; j < itemNames.length; j++) {
         restaurant.addNewItem(itemNames[j], itemPrices[j]);
       }
     }
-
-    // Mall admins
-    String[][] mallAdmins = {
-        { "admin1", "1234" },
-        { "admin2", "1234" }
-    };
-
-    for (int i = 0; i < mallAdmins.length; i++) {
-      String[] u = mallAdmins[i];
-      MallAdmin newAdmin = new MallAdmin(u[0], u[1]);
-      db.addAdmin(u[0], newAdmin);
-    }
+    
+    // Add mall admin
+    MallAdmin newAdmin = new MallAdmin("admin", "1234");
+    db.addAdmin("admin", newAdmin);
   }
 
   public static void main(String[] args) {
@@ -454,7 +449,7 @@ public class CLI {
       System.out.println();
       switch (cli.path) {
         case 0: // run it back
-          shouldExit = cli.mainCmds(cmd, scanner);
+          shouldExit = cli.mainCommands(cmd, scanner);
           break;
         case 1: // client
           cli.userCommands(cmd, scanner);

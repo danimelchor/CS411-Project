@@ -78,8 +78,10 @@ public class Database {
   }
 
   public ArrayList<String> getAllRestaurantNames() {
-    ArrayList<String> result = new ArrayList<String>();
+    // Store every restaurant name in an indexable way for listing
 
+    ArrayList<String> result = new ArrayList<String>();
+    
     for (String key : restaurantDatabase.keySet()) {
       result.add(key);
     }

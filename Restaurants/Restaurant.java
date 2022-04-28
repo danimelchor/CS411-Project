@@ -47,10 +47,14 @@ public class Restaurant {
   }
 
   public void displayMenu() {
+    // Displays the restaurant's menu in the following format:
+    // [Restaurant name] menu items:
+    // X. [Item name] - $[Item price]
+
     System.out.println(name + " menu items:");
     for (int i = 0; i < menu.size(); i++) {
       Item item = menu.get(i);
-      System.out.println(i + ". " + item.getName() + " - " + item.getPrice() + "$");
+      System.out.println(i + ". " + item.getName() + " - $" + item.getPrice());
     }
     System.out.println();
   }
@@ -64,6 +68,7 @@ public class Restaurant {
   }
 
   public double getTotalSales() {
+    // Adds the price of all orders for this restaurant
     double total = 0;
     for (Order o : orders) {
       total += o.getTotalPrice();

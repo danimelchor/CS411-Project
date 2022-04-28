@@ -21,6 +21,8 @@ public class Cart {
   }
 
   public void addItem(Item item) {
+    // Add an item to order or increase quantity if it already exists
+
     int quantity = 1;
     if (items.containsKey(item)) {
       quantity = items.get(item) + 1;
@@ -33,15 +35,8 @@ public class Cart {
     items.remove(item);
   }
 
-  public void setItemQuantity(Item item, int _quantity) {
-    if (_quantity > 0) {
-      items.replace(item, _quantity);
-    } else {
-      removeItem(item);
-    }
-  }
-
   public double getTotalPrice() {
+    // Adds the price of all the items in the cart
     double totalPrice = 0;
 
     for (Entry<Item, Integer> entry : items.entrySet()) {
@@ -54,6 +49,8 @@ public class Cart {
   }
 
   public ArrayList<Item> displayItems() {
+    // Prints all items in cart in the following format
+    // X. [NAME] (QUANTITY)
     ArrayList<Item> orderedItems = new ArrayList<>();
 
     for (Entry<Item, Integer> entry : items.entrySet()) {
@@ -69,6 +66,7 @@ public class Cart {
   }
 
   public void editItem(Item item, int newQuantity) {
+    // Edits the item quantity or removes if 0
     if (newQuantity > 0)
       items.put(item, newQuantity);
     else

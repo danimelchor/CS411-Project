@@ -14,6 +14,9 @@ public class Order {
   }
 
   public OrderStatus getStatus() {
+    // Returns the currect order status and
+    // moves order to next step (for simulation reasons)
+
     OrderStatus currStatus = status;
 
     if (status == OrderStatus.ORDERED)
@@ -33,6 +36,7 @@ public class Order {
   }
 
   public void setStatus(OrderStatus _status) {
+    // Sets the order status
     status = _status;
   }
 }

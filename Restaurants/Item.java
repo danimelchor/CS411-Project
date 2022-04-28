@@ -21,6 +21,7 @@ public class Item {
   }
 
   public void setPrice(double _price) {
+    // Sets the item price if not negative or zero
     if (_price > 0) {
       price = _price;
     }
