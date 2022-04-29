@@ -13,6 +13,9 @@ import Users.BasicUser;
 import Users.Client;
 import Users.MallAdmin;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+
 public class CLI {
   Database db = new Database();
   private int path = 0;
@@ -20,6 +23,10 @@ public class CLI {
   public static final String WHITE = "\u001B[0m";
   public static final String RED = "\u001B[31m";
   public static final String GREEN = "\u001B[32m";
+
+  // For testing
+  boolean test = false;
+  boolean errorHappened = false;
 
   // Either one should have a value if logged in
   BasicUser user;
@@ -36,16 +43,22 @@ public class CLI {
       "--- ADMIN PAGE ---\n 1. Get restaurant sales and statistics\n 2. Log out\n-----------------------------"
   };
 
-  public static void printError(String err) {
+  public void printError(String err) {
     System.out.println(RED + err + WHITE);
+
+    if(test) errorHappened = true;
   }
 
-  public static void printSuccess(String text) {
+  public void printSuccess(String text) {
     System.out.println(GREEN + text + WHITE);
   }
 
-  public static void printBold(String text) {
+  public void printBold(String text) {
     System.out.println("\033[1m" + text + "\033[0m");
+  }
+
+  public void isTest(boolean it) {
+    test = it;
   }
 
   public void logout() {
@@ -55,7 +68,7 @@ public class CLI {
     order = null;
   }
 
-  public boolean mainCommands(int cmd, Scanner scanner) {
+  public boolean mainCommands(int cmd, CustomScanner scanner) {
     boolean shouldExit = false;
 
     switch (cmd) {
@@ -159,7 +172,7 @@ public class CLI {
     return shouldExit;
   }
 
-  public void userCommands(int cmd, Scanner scanner) {
+  public void userCommands(int cmd, CustomScanner scanner) {
     /*
      * 1. Show restaurants
      * 2. Start a new order
@@ -275,7 +288,7 @@ public class CLI {
 
   }
 
-  public void restaurantOwnerCommands(int cmd, Scanner scanner) {
+  public void restaurantOwnerCommands(int cmd, CustomScanner scanner) {
     /*
      * 1. Show restaurant menu
      * 2. Add item to menu
@@ -360,7 +373,7 @@ public class CLI {
     }
   }
 
-  public void mallAdminCommands(int cmd, Scanner scanner) {
+  public void mallAdminCommands(int cmd, CustomScanner scanner) {
     /*
      * 1. Get sales statistics
      * 2. Log out
@@ -436,9 +449,7 @@ public class CLI {
     db.addAdmin("admin", newAdmin);
   }
 
-  public static void main(String[] args) {
-    Scanner scanner = new Scanner(System.in);
-    CLI cli = new CLI();
+  public static void run(CLI cli, CustomScanner scanner) {
     boolean shouldExit = false;
     prepopulate(cli);
 
@@ -447,6 +458,7 @@ public class CLI {
       System.out.print("Select an option (number): ");
       int cmd = scanner.nextInt();
       System.out.println();
+      
       switch (cli.path) {
         case 0: // run it back
           shouldExit = cli.mainCommands(cmd, scanner);
@@ -467,7 +479,125 @@ public class CLI {
       System.out.println();
 
     }
+  }
+  public static void main(String[] args) {
+    // Run program on test or normal mode
+    Scanner scanner = new Scanner(System.in);
+    System.out.print("Is this a test [y/n]: ");
+    String answer = scanner.next();
 
-    scanner.close();
+    CLI cli = new CLI();
+
+    // Custom scanner
+    CustomScanner customScanner;
+    boolean isTest = answer.equals("y");
+
+    // For tests
+    ArrayList<String> inputLines = new ArrayList<String>();
+    ArrayList<String> outputLines = new ArrayList<String>();
+
+
+    if(!isTest) {
+      customScanner = new CustomScanner(scanner);
+    } else {
+      // Display possible tests
+      File folder = new File("../testcases/");
+      File[] listOfFiles = folder.listFiles();
+      System.out.println();
+      System.out.println("Tests available:");
+      for (File f : listOfFiles) {
+        System.out.println(" - " + f.getName());
+      }
+      System.out.println();
+
+
+      // Get test name
+      System.out.print("What is the test name? ");
+      String testName = scanner.next();
+      scanner.close();
+
+      // Read test files
+      String inputFileName = "../testcases/" + testName + "/input.txt";
+      String outputFileName = "../testcases/" + testName + "/output.txt";
+
+      try {
+        // Read input test file
+        Scanner inputScanner = new Scanner(new File(inputFileName));
+        while (inputScanner.hasNextLine()) inputLines.add(inputScanner.nextLine());
+        inputScanner.close();
+
+        // Read output test file
+        Scanner outputScanner = new Scanner(new File(outputFileName));
+        while (outputScanner.hasNextLine()) outputLines.add(outputScanner.nextLine());
+        outputScanner.close();
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+      }
+      
+      customScanner = new CustomScanner(inputLines);
+      cli.isTest(true);
+    }
+
+    try {
+      run(cli, customScanner);
+    } catch(IndexOutOfBoundsException e) {
+      if(isTest) {
+        // Capture expected db output
+        ArrayList<String> testOutputLines = new ArrayList<String>();
+        testOutputLines.add(cli.errorHappened ? "true" : "false");
+        testOutputLines.add(cli.db.ownerDatabaseToString());
+        testOutputLines.add(cli.db.clientDatabaseToString());
+        testOutputLines.add(cli.db.restaurantDatabaseToString());
+        testOutputLines.add(cli.db.adminDatabaseToString());
+
+        System.out.println();
+
+        // Get if we are expecting an error and if it happened
+        boolean expectedError = outputLines.get(0).equals("true");
+        boolean errorOcurred = testOutputLines.get(0).equals("true");
+
+        // Check if output is the same
+        boolean testPassed = true;
+        for (int i = 1; i < testOutputLines.size(); i++) {
+          if(!testOutputLines.get(i).equals(outputLines.get(i))) {
+            testPassed = false;
+            break;
+          }
+        }
+
+        // Make space
+        for(int i = 0; i < 40; i++) System.out.println();
+
+        // Display results
+        if(testPassed && errorOcurred == expectedError) cli.printSuccess("Test passed");
+        else if(!testPassed && errorOcurred && expectedError) cli.printSuccess("Test passed");
+        else if (errorOcurred != expectedError) {
+          cli.printError("Test failed");
+          cli.printError("A runtime error ocurred.");
+        }
+        else {
+          cli.printError("Test failed");
+          System.out.println();
+          cli.printError("** OUTPUT **");
+          for (String s : testOutputLines) {
+            cli.printError(s);
+          }
+          System.out.println();
+          cli.printError("** EXPECTED OUTPUT **");
+          for (String s : outputLines) {
+            cli.printError(s);
+          }
+        }
+      }
+    } catch (Exception e) {
+      // Unexpected runtime error ocurred
+
+      // Make space
+      for(int i = 0; i < 40; i++) System.out.println();
+      
+      cli.printError("Test failed");
+      cli.printError("A runtime error ocurred.");
+      cli.printError(e.toString());
+    }
   }
 }

@@ -8,10 +8,10 @@ import Users.MallAdmin;
 import Restaurants.Restaurant;
 
 public class Database {
-  private HashMap<String, RestaurantOwner> ownerDatabase = new HashMap<>();
-  private HashMap<String, Client> clientDatabase = new HashMap<>();
-  private HashMap<String, Restaurant> restaurantDatabase = new HashMap<>();
-  private HashMap<String, MallAdmin> adminDatabase = new HashMap<>();
+  public HashMap<String, RestaurantOwner> ownerDatabase = new HashMap<>();
+  public HashMap<String, Client> clientDatabase = new HashMap<>();
+  public HashMap<String, Restaurant> restaurantDatabase = new HashMap<>();
+  public HashMap<String, MallAdmin> adminDatabase = new HashMap<>();
 
   // GET METHODS
   public Client getClientByUserName(String userName) {
@@ -118,5 +118,46 @@ public class Database {
     }
     return null;
 
+  }
+
+  // TESTING METHODS
+  public String adminDatabaseToString() {
+    String res = "{";
+    for (String k : adminDatabase.keySet()) {
+      MallAdmin a = adminDatabase.get(k);
+      res += k + "=" + a.getUserName() + "-" + a.getPassword() + ",";
+    }
+    res += "}";
+    return res;
+  }
+
+  public String clientDatabaseToString() {
+    String res = "{";
+    for (String k : clientDatabase.keySet()) {
+      Client c = clientDatabase.get(k);
+      res += k + "=" + c.getUserName() + "-" + c.getPassword() + ",";
+    }
+    res += "}";
+    return res;
+  }
+
+  public String restaurantDatabaseToString() {
+    String res = "{";
+    for (String k : restaurantDatabase.keySet()) {
+      Restaurant r = restaurantDatabase.get(k);
+      res += k + "=" + r.getRestaurantName() + "-" + r.getIsClosed() + "-" + r.getNumOfOrders() + ",";
+    }
+    res += "}";
+    return res;
+  }
+
+  public String ownerDatabaseToString() {
+    String res = "{";
+    for (String k : ownerDatabase.keySet()) {
+      RestaurantOwner r = ownerDatabase.get(k);
+      res += k + "=" + r.getUserName() + "-" + r.getPassword() + "-" + r.getRestaurant() + ",";
+    }
+    res += "}";
+    return res;
   }
 }
