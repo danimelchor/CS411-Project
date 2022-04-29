@@ -309,9 +309,9 @@ public class CLI {
         break;
       case 2:
         /* Add item to menu */
-        System.out.println("Name of item to add: ");
+        System.out.print("Name of item to add: ");
         String itemName = scanner.next();
-        System.out.println("Price of item: ");
+        System.out.print("Price of item: ");
         double itemPrice = scanner.nextDouble();
 
         Item i = new Item(itemName, itemPrice);
@@ -323,13 +323,14 @@ public class CLI {
       case 3:
         /* edit item in menu */
         r.displayMenu();
-        System.out.println("\nID of menu item to edit: ");
+        System.out.print("\nID of menu item to edit: ");
         int id = scanner.nextInt();
 
-        System.out.println("New name: ");
+        System.out.print("New name: ");
         itemName = scanner.next();
-        System.out.println("New price: ");
-        itemPrice = scanner.nextInt();
+
+        System.out.print("New price: ");
+        itemPrice = scanner.nextDouble();
 
         Item newItem = new Item(itemName, itemPrice);
         r.setItem(newItem, id);
@@ -595,9 +596,8 @@ public class CLI {
       // Make space
       for(int i = 0; i < 40; i++) System.out.println();
       
-      cli.printError("Test failed");
       cli.printError("A runtime error ocurred.");
-      cli.printError(e.toString());
+      cli.printError(e.getStackTrace().toString());
     }
   }
 }

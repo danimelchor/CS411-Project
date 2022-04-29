@@ -45,6 +45,8 @@ public class Cart {
       totalPrice += quantity * item.getPrice();
     }
 
+    totalPrice = Math.round(totalPrice * 100.0) / 100.0;
+
     return totalPrice;
   }
 
